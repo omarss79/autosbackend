@@ -1,11 +1,10 @@
 const express = require('express')
 const router = express.Router()
-const {getAutos} = require('../controllers/autoController')
-// const {getTareas, setTareas, updateTareas, deleteTareas} = require('../controllers/tareaController')
+const {getAutos, setAutos, updateAutos, deleteAutos} = require('../controllers/autoController')
 
 router.get('/', getAutos)
-// router.post('/', setTareas)
-// router.put('/:id', updateTareas)
-// router.delete('/:id', deleteTareas)
+router.post('/', setAutos)
+router.put('/:id', updateAutos)
+router.delete('/:id', deleteAutos)
 
 module.exports = router
