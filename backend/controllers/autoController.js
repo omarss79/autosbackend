@@ -2,7 +2,7 @@ const asyncHandler = require('express-async-handler')
 const Auto = require('../models/autoModel')
 
 const getAutos = asyncHandler( async (req, res) => {
-    const autos = await Auto.find()
+    const autos = await Auto.find({ user: req.user.id })
     res.status(200).json(autos)
 })
 const setAutos = asyncHandler( async (req, res) => {
@@ -26,7 +26,8 @@ const setAutos = asyncHandler( async (req, res) => {
         marca: req.body.marca,
         modelo: req.body.modelo,
         ann: req.body.ann,
-        color: req.body.color
+        color: req.body.color,
+        user: req.user.id
     })
     res.status(201).json(auto)
 })
@@ -36,8 +37,14 @@ const updateAutos = asyncHandler( async (req, res) => {
         res.status(400)
         throw new Error('Auto no encontrado')
     }
-    const autoModificado = await Auto.findByIdAndUpdate(req.params.id, req.body, {new: true})
-    res.status(200).json({'message':autoModificado})
+    //Verificamos que el auto pertenece al usuario del token
+    if (auto.user.toString() !== req.user.id) {
+        res.status(401)
+        throw new Error('Acceso no Autorizado, el auto no pertenece al usuario logueado')
+    }
+    
+    const autoModificado = await Auto.findByIdAndUpdate(req.params.id, req.body, { new: true })
+    res.status(200).json(autoModificado)
 })
 const deleteAutos = asyncHandler( async (req, res) => {
     const auto = await Auto.findById(req.params.id)
@@ -45,9 +52,14 @@ const deleteAutos = asyncHandler( async (req, res) => {
         res.status(400)
         throw new Error('Auto no encontrado')
     }
-    // await auto.removeOne()
-    const autoEliminado = await Auto.findByIdAndRemove(req.params.id)
-    res.status(200).json({'message':`Auto elimnado: ${req.params.id}`})
+    //Verificamos que el auto pertenece al usuario del token
+    if (auto.user.toString() !== req.user.id) {
+        res.status(401)
+        throw new Error('Acceso no Autorizado, el auto no pertenece al usuario logueado')
+    }
+
+    await auto.deleteOne()
+    res.status(200).json({ id: req.params.id })
 })
 
 module.exports = {

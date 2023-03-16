@@ -16,6 +16,11 @@ const autosSchema = mongoose.Schema({
     color: {
         type:String,
         required: [true, 'Por favor, teclea un color']
+    },
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
     }
 },{
     timestamps: true
